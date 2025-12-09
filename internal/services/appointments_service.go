@@ -43,7 +43,7 @@ func (as *AppointmentsService) GetAvailableSpots(ctx context.Context, userID int
 		return nil, "", fmt.Errorf("invalid date: %w", err)
 	}
 	if date.Before(time.Now().Truncate(24 * time.Hour)) {
-		return nil, "date is in the past", fmt.Errorf("date is in the past. %w", date)
+		return nil, "date is in the past", fmt.Errorf("date is in the past. %v", date)
 	}
 
 	// Fetch availability

@@ -15,7 +15,7 @@ type RegisterRequest struct {
 func (api *API) handleRegister(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewHTTPError(http.StatusBadRequest, err.Error()))
 		return
 	}
 
@@ -25,7 +25,7 @@ func (api *API) handleRegister(c *gin.Context) {
 		req.Email,
 		req.Password)
 	if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		c.Error(NewHTTPError(http.StatusUnprocessableEntity, err.Error()))
 		return
 	}
 
@@ -40,7 +40,7 @@ type LoginRequest struct {
 func (api *API) handleLogin(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewHTTPError(http.StatusBadRequest, err.Error()))
 		return
 	}
 	user, err := api.UserService.AuthenticateUser(
@@ -49,7 +49,7 @@ func (api *API) handleLogin(c *gin.Context) {
 		req.Password,
 	)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewHTTPError(http.StatusBadRequest, err.Error()))
 		return
 	}
 	c.JSON(http.StatusOK, user)

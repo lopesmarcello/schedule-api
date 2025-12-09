@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +20,7 @@ type SetAvailabilityReq struct {
 func (api *API) handleSetAvailability(c *gin.Context) {
 	var req SetAvailabilityReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Error(NewHTTPError(http.StatusBadRequest, err.Error()))
 		return
 	}
 
@@ -33,7 +32,7 @@ func (api *API) handleSetAvailability(c *gin.Context) {
 			avail.StartTime,
 			avail.EndTime)
 		if err != nil {
-			fmt.Println(err)
+			c.Error(err)
 			return
 		}
 	}

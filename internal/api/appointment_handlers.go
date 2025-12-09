@@ -13,13 +13,13 @@ func (api *API) handleGetSlots(c *gin.Context) {
 	// Find userID by slug (assume a service method)
 	user, err := api.UserService.GetUserBySlug(c.Request.Context(), userSlug)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		c.Error(NewHTTPError(http.StatusNotFound, "user not found"))
 		return
 	}
 
 	slots, _, err := api.AppointmentsService.GetAvailableSpots(c.Request.Context(), user.ID, dateStr)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.Error(err)
 		return
 	}
 

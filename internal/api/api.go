@@ -11,3 +11,19 @@ type API struct {
 	AvailabilityService services.AvailabilityService
 	AppointmentsService services.AppointmentsService
 }
+
+func NewAPI(userService services.UserService, availabilityService services.AvailabilityService, appointmentsService services.AppointmentsService) *API {
+	router := gin.Default()
+	api := &API{
+		Router:              router,
+		UserService:         userService,
+		AvailabilityService: availabilityService,
+		AppointmentsService: appointmentsService,
+	}
+
+	router.Use(ErrorHandler())
+
+	api.BindRoutes()
+
+	return api
+}

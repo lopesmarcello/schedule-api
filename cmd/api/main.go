@@ -20,8 +20,6 @@ func init() {
 func main() {
 	fmt.Println("hello from api!")
 
-	r := gin.Default()
-
 	ctx := context.Background()
 	pool, err := pgxpool.New(ctx, fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable search_path=public",
 		os.Getenv("SCHED_DATABASE_USER"),
@@ -41,14 +39,11 @@ func main() {
 		panic(fmt.Sprintf("Unable to ping database %v", err))
 	}
 
-	api := api.API{
-		Router:              r,
-		UserService:         services.NewUserService(pool),
-		AvailabilityService: services.NewAvailabilityService(pool),
-		AppointmentsService: services.NewAppointmentsService(pool),
-	}
+	userService := services.NewUserService(pool)
+	availabilityService := services.NewAvailabilityService(pool)
+	appointmentsService := services.NewAppointmentsService(pool)
 
-	api.BindRoutes()
+	api := api.NewAPI(*userService, *availabilityService, *appointmentsService)
 
 	// Start server on 8080
 	// 0.0.0.0:8080 || localhost:8080

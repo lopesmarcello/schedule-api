@@ -16,4 +16,5 @@ func (api *API) BindRoutes() {
 	v1 := api.Router.Group("/api/v1")
 
 	v1.POST("/user", api.handleRegister)
+	v1.POST("/login", api.handleLogin)
 }

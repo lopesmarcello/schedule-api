@@ -3,8 +3,10 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/lopesmarcello/schedule-api/internal/repositories/pg"
 	"golang.org/x/crypto/bcrypt"
@@ -64,4 +66,24 @@ func (us *UserService) CreateUser(ctx context.Context, name, email, password str
 	}
 
 	return dbUser, nil
+}
+
+func (us *UserService) AuthenticateUser(ctx context.Context, email, password string) (pg.User, error) {
+	user, err := us.queries.GetUserByEmail(ctx, email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			fmt.Println("err no rows", err)
+			return pg.User{}, errors.New("invalid credentials")
+		}
+		fmt.Println("err searching for user", err)
+		return pg.User{}, errors.New("invalid credentials")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		fmt.Println("err comparing hash", err)
+		return pg.User{}, errors.New("invalid credentials")
+	}
+
+	return user, nil
 }

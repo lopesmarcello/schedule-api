@@ -31,3 +31,26 @@ func (api *API) handleRegister(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, user)
 }
+
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+func (api *API) handleLogin(c *gin.Context) {
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := api.UserService.AuthenticateUser(
+		c.Request.Context(),
+		req.Email,
+		req.Password,
+	)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, user)
+}

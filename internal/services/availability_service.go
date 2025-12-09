@@ -34,7 +34,7 @@ func (as *AvailabilityService) SetAvailability(ctx context.Context, userID, day 
 		Valid:        true,
 	}
 
-	endTime, err := time.Parse("15:04:05", start)
+	endTime, err := time.Parse("15:04:05", end)
 	if err != nil {
 		return fmt.Errorf("invalid start time: %w", err)
 	}
@@ -50,14 +50,14 @@ func (as *AvailabilityService) SetAvailability(ctx context.Context, userID, day 
 		Valid: true,
 	}
 
-	params := pg.SetAvailabilityParams{
+	params := pg.CreateAvailabilityParams{
 		UserID:    userPgID,
 		DayOfWeek: int32(day),
 		StartTime: startPg,
 		EndTime:   endPg,
 	}
 
-	err = as.queries.SetAvailability(ctx, params)
+	_, err = as.queries.CreateAvailability(ctx, params)
 	if err != nil {
 		return fmt.Errorf("error setting availability %w", err)
 	}

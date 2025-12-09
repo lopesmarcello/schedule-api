@@ -11,6 +11,20 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
+  db_test:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - ${SCHED_TEST_DATABASE_PORT:-5433}:5432
+    environment:
+      POSTGRES_USER: ${SCHED_TEST_DATABASE_USER}
+      POSTGRES_PASSWORD: ${SCHED_TEST_DATABASE_PASSWORD}
+      POSTGRES_DB: ${SCHED_TEST_DATABASE_NAME}
+    volumes:
+      - db_test:/var/lib/postgresql/data
+
 volumes:
   db:
+    driver: local
+  db_test:
     driver: local

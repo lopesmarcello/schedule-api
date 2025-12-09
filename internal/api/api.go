@@ -9,4 +9,5 @@ type API struct {
 	Router              *gin.Engine
 	UserService         services.UserService
 	AvailabilityService services.AvailabilityService
+	AppointmentsService services.AppointmentsService
 }

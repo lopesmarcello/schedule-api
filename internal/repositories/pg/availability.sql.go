@@ -11,25 +11,78 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const setAvailability = `-- name: SetAvailability :exec
-INSERT INTO availability (
-  user_id, day_of_week, start_time, end_time
-) VALUES ( $1, $2, $3, $4  )
+const createAvailability = `-- name: CreateAvailability :one
+INSERT INTO availability (user_id, day_of_week, start_time, end_time)
+VALUES ($1, $2, $3, $4)
+RETURNING id, user_id, day_of_week, start_time, end_time
 `
 
-type SetAvailabilityParams struct {
+type CreateAvailabilityParams struct {
 	UserID    pgtype.Int4 `json:"user_id"`
 	DayOfWeek int32       `json:"day_of_week"`
 	StartTime pgtype.Time `json:"start_time"`
 	EndTime   pgtype.Time `json:"end_time"`
 }
 
-func (q *Queries) SetAvailability(ctx context.Context, arg SetAvailabilityParams) error {
-	_, err := q.db.Exec(ctx, setAvailability,
+func (q *Queries) CreateAvailability(ctx context.Context, arg CreateAvailabilityParams) (Availability, error) {
+	row := q.db.QueryRow(ctx, createAvailability,
 		arg.UserID,
 		arg.DayOfWeek,
 		arg.StartTime,
 		arg.EndTime,
 	)
+	var i Availability
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.DayOfWeek,
+		&i.StartTime,
+		&i.EndTime,
+	)
+	return i, err
+}
+
+const deleteAllAvailabilities = `-- name: DeleteAllAvailabilities :exec
+DELETE FROM availability
+`
+
+func (q *Queries) DeleteAllAvailabilities(ctx context.Context) error {
+	_, err := q.db.Exec(ctx, deleteAllAvailabilities)
 	return err
+}
+
+const getAvailabilityForDay = `-- name: GetAvailabilityForDay :many
+SELECT id, user_id, day_of_week, start_time, end_time FROM availability
+WHERE user_id = $1 AND day_of_week = $2
+`
+
+type GetAvailabilityForDayParams struct {
+	UserID    pgtype.Int4 `json:"user_id"`
+	DayOfWeek int32       `json:"day_of_week"`
+}
+
+func (q *Queries) GetAvailabilityForDay(ctx context.Context, arg GetAvailabilityForDayParams) ([]Availability, error) {
+	rows, err := q.db.Query(ctx, getAvailabilityForDay, arg.UserID, arg.DayOfWeek)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Availability
+	for rows.Next() {
+		var i Availability
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.DayOfWeek,
+			&i.StartTime,
+			&i.EndTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

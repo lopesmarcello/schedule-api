@@ -88,3 +88,17 @@ func (us *UserService) AuthenticateUser(ctx context.Context, email, password str
 
 	return user, nil
 }
+
+func (us *UserService) GetUserBySlug(ctx context.Context, slug string) (pg.User, error) {
+	user, err := us.queries.GetUserBySlug(ctx, slug)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			fmt.Println("err no rows", err)
+			return pg.User{}, errors.New("invalid slug")
+		}
+		fmt.Println("err searching for user", err)
+		return pg.User{}, errors.New("invalid credentials")
+	}
+
+	return user, nil
+}

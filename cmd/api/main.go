@@ -45,6 +45,7 @@ func main() {
 		Router:              r,
 		UserService:         services.NewUserService(pool),
 		AvailabilityService: services.NewAvailabilityService(pool),
+		AppointmentsService: services.NewAppointmentsService(pool),
 	}
 
 	api.BindRoutes()

@@ -42,8 +42,9 @@ func main() {
 	}
 
 	api := api.API{
-		Router:      r,
-		UserService: services.NewUserService(pool),
+		Router:              r,
+		UserService:         services.NewUserService(pool),
+		AvailabilityService: services.NewAvailabilityService(pool),
 	}
 
 	api.BindRoutes()

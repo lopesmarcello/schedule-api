@@ -6,6 +6,7 @@ import (
 )
 
 type API struct {
-	Router      *gin.Engine
-	UserService services.UserService
+	Router              *gin.Engine
+	UserService         services.UserService
+	AvailabilityService services.AvailabilityService
 }

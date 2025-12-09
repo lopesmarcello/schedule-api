@@ -17,4 +17,5 @@ func (api *API) BindRoutes() {
 
 	v1.POST("/user", api.handleRegister)
 	v1.POST("/login", api.handleLogin)
+	v1.POST("/availability", api.handleSetAvailability)
 }

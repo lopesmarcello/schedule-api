@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -45,7 +46,7 @@ func (us *UserService) CreateUser(ctx context.Context, name, email, password str
 		exists, _ := us.queries.GetUserBySlug(ctx, slug)
 		if exists.ID != 0 {
 			modifier++
-			slug = slug + "-" + string(modifier)
+			slug = slug + "-" + strconv.Itoa(modifier)
 		}
 
 		if exists.ID == 0 {
